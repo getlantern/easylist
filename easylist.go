@@ -70,10 +70,22 @@ type list struct {
 }
 
 func (l *list) Allow(req *http.Request) bool {
+	m := l.getMatcher()
+	if m == nil {
+		// Until we've been initialized, allow everything
+		return true
+	}
 	ar := &adblock.Request{
 		URL:    req.URL.String(),
 		Domain: req.Host,
 	}
 	matched, _, _ := l.matcher.Match(ar)
 	return !matched
+}
+
+func (l *list) getMatcher() *adblock.RuleMatcher {
+	l.mx.RLock()
+	m := l.matcher
+	l.mx.RUnlock()
+	return m
 }
