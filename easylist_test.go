@@ -23,3 +23,16 @@ func TestBlock(t *testing.T) {
 	req, _ = http.NewRequest("GET", "https://googleads.g.doubleclick.net", nil)
 	assert.False(t, l.Allow(req))
 }
+
+func BenchmarkPass(b *testing.B) {
+	l, err := Open("easylist.txt", 5*time.Minute)
+	if err != nil {
+		b.Fatalf("Unable to open easylist: %v", err)
+	}
+
+	b.ResetTimer()
+	req, _ := http.NewRequest("GET", "http://osnews.com", nil)
+	for i := 0; i < b.N; i++ {
+		l.Allow(req)
+	}
+}
