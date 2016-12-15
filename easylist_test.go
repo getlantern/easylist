@@ -2,6 +2,8 @@ package easylist
 
 import (
 	"net/http"
+	"os"
+	"runtime/pprof"
 	"testing"
 	"time"
 
@@ -29,6 +31,18 @@ func BenchmarkPass(b *testing.B) {
 	if err != nil {
 		b.Fatalf("Unable to open easylist: %v", err)
 	}
+
+	// After loading rules, start CPU profiling
+	os.Remove("benchmark.cpuprofile")
+	cp, err := os.Create("benchmark.cpuprofile")
+	if err != nil {
+		b.Fatalf("Unable to create benchmark.cpuprofile: %v", err)
+	}
+	err = pprof.StartCPUProfile(cp)
+	if err != nil {
+		b.Fatalf("Unable to start CPU profiling: %v", err)
+	}
+	defer pprof.StopCPUProfile()
 
 	b.ResetTimer()
 	req, _ := http.NewRequest("GET", "http://osnews.com", nil)
