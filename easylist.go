@@ -79,7 +79,7 @@ func (l *list) Allow(req *http.Request) bool {
 		URL:    req.URL.String(),
 		Domain: req.Host,
 	}
-	matched, _, _ := l.matcher.Match(ar)
+	matched, _, _ := m.Match(ar)
 	return !matched
 }
 
