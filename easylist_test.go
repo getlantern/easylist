@@ -17,13 +17,20 @@ func TestBlock(t *testing.T) {
 	}
 
 	req, _ := http.NewRequest("GET", "http://osnews.com", nil)
-	assert.True(t, l.Allow(req))
+	assert.True(t, l.Allow(req), "Domain that doesn't appear on list should be allowed")
 
-	req, _ = http.NewRequest("GET", "http://somedomain.com/adwords/stuff", nil)
-	assert.False(t, l.Allow(req))
+	// Not currently checking non-domain-specific rules
+	// req, _ = http.NewRequest("GET", "http://somedomain.com/adwords/stuff", nil)
+	// assert.False(t, l.Allow(req))
 
-	req, _ = http.NewRequest("GET", "https://googleads.g.doubleclick.net", nil)
-	assert.False(t, l.Allow(req))
+	req, _ = http.NewRequest("GET", "https://cdn.adblade.com", nil)
+	assert.False(t, l.Allow(req), "Domain on list should not be allowed")
+
+	req, _ = http.NewRequest("GET", "https://c-sharpcorner.com/something/allowed", nil)
+	assert.True(t, l.Allow(req), "Domain with path not matching rule should be allowed")
+
+	req, _ = http.NewRequest("GET", "https://c-sharpcorner.com/stuff/banners/", nil)
+	assert.False(t, l.Allow(req), "Domain with path matching rule should not be allowed")
 }
 
 func BenchmarkPass(b *testing.B) {
