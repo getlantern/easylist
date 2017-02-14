@@ -46,10 +46,7 @@ func Open(cacheFile string, checkInterval time.Duration) (List, error) {
 		addedRules := 0
 		skippedRules := 0
 		for _, rule := range rules {
-			if len(rule.Parts) == 0 {
-				continue
-			}
-			if rule.Parts[0].Type != adblock.DomainAnchor {
+			if len(rule.Parts) == 0 || rule.Parts[0].Type != adblock.DomainAnchor {
 				// Only matching stuff anchored to domains
 				continue
 			}
