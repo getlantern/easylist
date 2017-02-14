@@ -12,9 +12,9 @@ import (
 	"time"
 
 	"github.com/armon/go-radix"
+	"github.com/getlantern/adblock/adblock"
 	"github.com/getlantern/golog"
 	"github.com/getlantern/urlcache"
-	"github.com/pmezard/adblock/adblock"
 )
 
 const (
@@ -46,6 +46,9 @@ func Open(cacheFile string, checkInterval time.Duration) (List, error) {
 		addedRules := 0
 		skippedRules := 0
 		for _, rule := range rules {
+			if len(rule.Parts) == 0 {
+				continue
+			}
 			if rule.Parts[0].Type != adblock.DomainAnchor {
 				// Only matching stuff anchored to domains
 				continue
@@ -106,8 +109,9 @@ func (l *list) Allow(req *http.Request) bool {
 		return true
 	}
 	ar := &adblock.Request{
-		URL:    req.URL.String(),
-		Domain: req.Host,
+		URL:          req.URL.String(),
+		Domain:       req.Host,
+		OriginDomain: domainFromURL(req.Header.Get("Origin")),
 	}
 	matched, _, _ := dm.Match(ar)
 	return !matched
@@ -121,4 +125,15 @@ func (l *list) getMatcher(domain string) (dm *adblock.RuleMatcher) {
 		dm = _dm.(*adblock.RuleMatcher)
 	}
 	return
+}
+
+func domainFromURL(u string) string {
+	if u == "" {
+		return ""
+	}
+	_u, e := url.Parse(u)
+	if e != nil {
+		return ""
+	}
+	return _u.Host
 }

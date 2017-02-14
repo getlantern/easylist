@@ -31,6 +31,11 @@ func TestBlock(t *testing.T) {
 
 	req, _ = http.NewRequest("GET", "https://c-sharpcorner.com/stuff/banners/", nil)
 	assert.False(t, l.Allow(req), "Domain with path matching rule should not be allowed")
+
+	req, _ = http.NewRequest("GET", "https://s3.amazonaws.com", nil)
+	assert.True(t, l.Allow(req), "Domain should be allowed by default")
+	req.Header.Set("Origin", "https://gaybeeg.info")
+	assert.False(t, l.Allow(req), "Domain loaded from specific domains should not be allowed")
 }
 
 func BenchmarkPass(b *testing.B) {
