@@ -38,6 +38,12 @@ func TestBlock(t *testing.T) {
 	assert.False(t, l.Allow(req), "Domain loaded from specific domains should not be allowed")
 }
 
+func TestEmpty(t *testing.T) {
+	l := &list{}
+	req, _ := http.NewRequest("GET", "https://random-site.com", nil)
+	assert.True(t, l.Allow(req), "Domain should be allowed if list is empty")
+}
+
 func BenchmarkPass(b *testing.B) {
 	l, err := Open("easylist.txt", 5*time.Minute)
 	if err != nil {

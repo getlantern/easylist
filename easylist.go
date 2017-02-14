@@ -116,6 +116,10 @@ func (l *list) Allow(req *http.Request) bool {
 
 func (l *list) getMatcher(domain string) (dm *adblock.RuleMatcher) {
 	l.mx.RLock()
+	if l.domainMatchers == nil {
+		l.mx.RUnlock()
+		return
+	}
 	_dm, found := l.domainMatchers.Get(domain)
 	l.mx.RUnlock()
 	if found {
