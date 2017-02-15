@@ -12,9 +12,9 @@ import (
 	"time"
 
 	"github.com/armon/go-radix"
-	"github.com/getlantern/adblock/adblock"
 	"github.com/getlantern/golog"
 	"github.com/getlantern/urlcache"
+	"github.com/pmezard/adblock/adblock"
 )
 
 const (
