@@ -5,6 +5,7 @@ package easylist
 import (
 	"fmt"
 	"io"
+	"net"
 	"net/http"
 	"net/url"
 	"strings"
@@ -100,15 +101,16 @@ type list struct {
 }
 
 func (l *list) Allow(req *http.Request) bool {
-	dm := l.getMatcher(req.Host)
+	domain := withoutPort(req.Host)
+	dm := l.getMatcher(domain)
 	if dm == nil {
 		// Until we've been initialized, allow everything
 		return true
 	}
 	ar := &adblock.Request{
 		URL:          req.URL.String(),
-		Domain:       req.Host,
-		OriginDomain: domainFromURL(req.Header.Get("Origin")),
+		Domain:       domain,
+		OriginDomain: withoutPort(domainFromURL(req.Header.Get("Origin"))),
 	}
 	matched, _, _ := dm.Match(ar)
 	return !matched
@@ -137,4 +139,12 @@ func domainFromURL(u string) string {
 		return ""
 	}
 	return _u.Host
+}
+
+func withoutPort(hostport string) string {
+	host, _, err := net.SplitHostPort(hostport)
+	if err != nil {
+		return hostport
+	}
+	return host
 }

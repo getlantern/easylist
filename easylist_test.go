@@ -26,6 +26,12 @@ func TestBlock(t *testing.T) {
 	req, _ = http.NewRequest("GET", "https://cdn.adblade.com", nil)
 	assert.False(t, l.Allow(req), "Domain on list should not be allowed")
 
+	req, _ = http.NewRequest("GET", "http://cdn.adblade.com:8080", nil)
+	assert.False(t, l.Allow(req), "Domain on list should not be allowed")
+
+	req, _ = http.NewRequest("GET", "https://cdn.adblade.com:443", nil)
+	assert.False(t, l.Allow(req), "Domain on list should not be allowed")
+
 	req, _ = http.NewRequest("GET", "https://c-sharpcorner.com/something/allowed", nil)
 	assert.True(t, l.Allow(req), "Domain with path not matching rule should be allowed")
 
