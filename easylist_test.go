@@ -32,14 +32,27 @@ func TestBlock(t *testing.T) {
 	req, _ = http.NewRequest("GET", "https://cdn.adblade.com:443", nil)
 	assert.False(t, l.Allow(req), "Domain on list should not be allowed")
 
+	req, _ = http.NewRequest("GET", "https://subdomain.cdn.adblade.com:443", nil)
+	assert.False(t, l.Allow(req), "Subdomain of domain on list should not be allowed")
+
+	req, _ = http.NewRequest("GET", "https://subdomaincdn.adblade.com:443", nil)
+	assert.True(t, l.Allow(req), "Superset name of domain on list (looks like subdomain without dot separator) should be allowed")
+
 	req, _ = http.NewRequest("GET", "https://c-sharpcorner.com/something/allowed", nil)
 	assert.True(t, l.Allow(req), "Domain with path not matching rule should be allowed")
 
 	req, _ = http.NewRequest("GET", "https://c-sharpcorner.com/stuff/banners/", nil)
 	assert.False(t, l.Allow(req), "Domain with path matching rule should not be allowed")
 
+	req, _ = http.NewRequest("GET", "https://subdomain.c-sharpcorner.com/stuff/banners/", nil)
+	assert.False(t, l.Allow(req), "Subdomain with path matching rule should not be allowed")
+
+	// req, _ = http.NewRequest("GET", "https://tpc.googlesyndication.com/pagead/imgad?id=CICAgKDLm4jqFBABGAEyCIOA1Ft_hUOC", nil)
+	// assert.False(t, l.Allow(req), "Subdomain with path matching rule should not be allowed")
+
 	req, _ = http.NewRequest("GET", "https://s3.amazonaws.com", nil)
 	assert.True(t, l.Allow(req), "Domain should be allowed by default")
+
 	req.Header.Set("Origin", "https://gaybeeg.info")
 	assert.False(t, l.Allow(req), "Domain loaded from specific domains should not be allowed")
 }
