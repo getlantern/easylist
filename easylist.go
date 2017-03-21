@@ -62,6 +62,7 @@ func Open(cacheFile string, checkInterval time.Duration) (List, error) {
 				skippedRules++
 				continue
 			}
+			u.Path = ""
 			u.RawPath = ""
 			u.RawQuery = ""
 			reversedDomain := reverse(u.String())

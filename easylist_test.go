@@ -47,8 +47,8 @@ func TestBlock(t *testing.T) {
 	req, _ = http.NewRequest("GET", "https://subdomain.c-sharpcorner.com/stuff/banners/", nil)
 	assert.False(t, l.Allow(req), "Subdomain with path matching rule should not be allowed")
 
-	// req, _ = http.NewRequest("GET", "https://tpc.googlesyndication.com/pagead/imgad?id=CICAgKDLm4jqFBABGAEyCIOA1Ft_hUOC", nil)
-	// assert.False(t, l.Allow(req), "Subdomain with path matching rule should not be allowed")
+	req, _ = http.NewRequest("GET", "https://tpc.googlesyndication.com/pagead/imgad?id=CICAgKDLm4jqFBABGAEyCIOA1Ft_hUOC", nil)
+	assert.False(t, l.Allow(req), "Subdomain with path matching rule should not be allowed")
 
 	req, _ = http.NewRequest("GET", "https://s3.amazonaws.com", nil)
 	assert.True(t, l.Allow(req), "Domain should be allowed by default")
