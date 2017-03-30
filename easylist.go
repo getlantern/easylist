@@ -62,15 +62,16 @@ func Open(cacheFile string, checkInterval time.Duration) (List, error) {
 				skippedRules++
 				continue
 			}
+			u.Path = ""
 			u.RawPath = ""
 			u.RawQuery = ""
-			domain := u.String()
-			_matcher, found := domainMatchers[domain]
+			reversedDomain := reverse(u.String())
+			_matcher, found := domainMatchers[reversedDomain]
 			if found {
 				matcher = _matcher.(*adblock.RuleMatcher)
 			} else {
 				matcher = adblock.NewMatcher()
-				domainMatchers[domain] = matcher
+				domainMatchers[reversedDomain] = matcher
 			}
 			err = matcher.AddRule(rule, 0)
 			if err != nil {
@@ -102,7 +103,7 @@ type list struct {
 
 func (l *list) Allow(req *http.Request) bool {
 	domain := withoutPort(req.Host)
-	dm := l.getMatcher(domain)
+	dm := l.getMatcher(reverse(domain))
 	if dm == nil {
 		// Until we've been initialized, allow everything
 		return true
@@ -116,13 +117,13 @@ func (l *list) Allow(req *http.Request) bool {
 	return !matched
 }
 
-func (l *list) getMatcher(domain string) (dm *adblock.RuleMatcher) {
+func (l *list) getMatcher(reversedDomain string) (dm *adblock.RuleMatcher) {
 	l.mx.RLock()
 	if l.domainMatchers == nil {
 		l.mx.RUnlock()
 		return
 	}
-	_dm, found := l.domainMatchers.Get(domain)
+	_, _dm, found := l.domainMatchers.LongestPrefix(reversedDomain)
 	l.mx.RUnlock()
 	if found {
 		dm = _dm.(*adblock.RuleMatcher)
@@ -147,4 +148,23 @@ func withoutPort(hostport string) string {
 		return hostport
 	}
 	return host
+}
+
+func reverse(input string) string {
+	n := 0
+	runes := make([]rune, len(input)+1)
+	// Add a dot prefix to make sure we're only operating on subdomains
+	runes[0] = '.'
+	runes = runes[1:]
+	for _, r := range input {
+		runes[n] = r
+		n++
+	}
+	runes = runes[0:n]
+	// Reverse
+	for i := 0; i < n/2; i++ {
+		runes[i], runes[n-1-i] = runes[n-1-i], runes[i]
+	}
+	// Convert back to UTF-8.
+	return string(runes)
 }
