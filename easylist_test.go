@@ -10,6 +10,12 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func TestReverse(t *testing.T) {
+	a := "abcdefg"
+	b := "gfedcba"
+	assert.Equal(t, b, reverse(a), "did not reverse correctly?")
+}
+
 func TestBlock(t *testing.T) {
 	l, err := Open("easylist.txt", 5*time.Minute)
 	if !assert.NoError(t, err) {
