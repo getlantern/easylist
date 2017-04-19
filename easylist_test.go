@@ -22,6 +22,11 @@ func TestBlock(t *testing.T) {
 		return
 	}
 
+	_l := l.(*list)
+	assert.True(t, _l.domainMatchers.Len() > 1000, "List has too few domains")
+	m, _ := _l.domainMatchers.Get(reverse("cdn.adblade.com"))
+	assert.NotNil(t, m)
+
 	req, _ := http.NewRequest("GET", "http://osnews.com", nil)
 	assert.True(t, l.Allow(req), "Domain that doesn't appear on list should be allowed")
 
