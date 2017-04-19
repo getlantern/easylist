@@ -56,16 +56,13 @@ func Open(cacheFile string, checkInterval time.Duration) (List, error) {
 			if strings.HasSuffix(_u, "%") {
 				_u = _u[:len(_u)-1]
 			}
-			u, parseErr := url.Parse(_u)
+			u, parseErr := url.Parse(fmt.Sprintf("http://%v", _u))
 			if parseErr != nil {
 				log.Errorf("Unable to parse %v: %v", _u, parseErr)
 				skippedRules++
 				continue
 			}
-			u.Path = ""
-			u.RawPath = ""
-			u.RawQuery = ""
-			reversedDomain := reverse(u.String())
+			reversedDomain := reverse(u.Host)
 			_matcher, found := domainMatchers[reversedDomain]
 			if found {
 				matcher = _matcher.(*adblock.RuleMatcher)
