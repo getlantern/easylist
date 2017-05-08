@@ -70,11 +70,23 @@ func Open(cacheFile string, checkInterval time.Duration) (List, error) {
 				matcher = adblock.NewMatcher()
 				domainMatchers[reversedDomain] = matcher
 			}
-			err = matcher.AddRule(rule, 0)
-			if err != nil {
+			// Some options require knowledge that's not available outside of the
+			// the browser. The adblock library currently ignores such options, but
+			// we actually want to exclude these rules completely since we don't have
+			// the information needed to properly process them.
+			if rule.Opts.ObjectSubRequest != nil ||
+				rule.Opts.Other != nil ||
+				rule.Opts.SubDocument != nil ||
+				rule.Opts.XmlHttpRequest != nil {
+				log.Debugf("Skipping rule with unsupported option: %v", rule.Raw)
 				skippedRules++
 			} else {
-				addedRules++
+				err = matcher.AddRule(rule, 0)
+				if err != nil {
+					skippedRules++
+				} else {
+					addedRules++
+				}
 			}
 		}
 
