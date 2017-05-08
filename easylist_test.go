@@ -58,8 +58,23 @@ func TestBlock(t *testing.T) {
 	req, _ = http.NewRequest("GET", "https://subdomain.c-sharpcorner.com/stuff/banners/", nil)
 	assert.False(t, l.Allow(req), "Subdomain with path matching rule should not be allowed")
 
-	req, _ = http.NewRequest("GET", "https://tpc.googlesyndication.com/pagead/imgad?id=CICAgKDLm4jqFBABGAEyCIOA1Ft_hUOC", nil)
+	req, _ = http.NewRequest("GET", "https://subdomain.google.com/pagead/imgad?id=CICAgKDLm4jqFBABGAEyCIOA1Ft_hUOC", nil)
 	assert.False(t, l.Allow(req), "Subdomain with path matching rule should not be allowed")
+
+	req, _ = http.NewRequest("GET", "https://s3.amazonaws.com", nil)
+	assert.True(t, l.Allow(req), "Domain should be allowed by default")
+
+	req, _ = http.NewRequest("GET", "https://tnaflix.com/ad/index.html", nil)
+	assert.True(t, l.Allow(req), "Rule with unsupported object-subrequest option should be ignored")
+
+	req, _ = http.NewRequest("GET", "https://vidible.tv/prod/index.html", nil)
+	assert.True(t, l.Allow(req), "Rule with unsupported other option should be ignored")
+
+	req, _ = http.NewRequest("GET", "https://s1.wp.com/index.html", nil)
+	assert.True(t, l.Allow(req), "Rule with unsupported subdocument option should be ignored")
+
+	req, _ = http.NewRequest("GET", "https://redtube.com/gallery/index.html", nil)
+	assert.True(t, l.Allow(req), "Rule with unsupported xmlhttprequest option should be ignored")
 
 	req, _ = http.NewRequest("GET", "https://s3.amazonaws.com", nil)
 	assert.True(t, l.Allow(req), "Domain should be allowed by default")
