@@ -78,7 +78,7 @@ func Open(cacheFile string, checkInterval time.Duration) (List, error) {
 				rule.Opts.Other != nil ||
 				rule.Opts.SubDocument != nil ||
 				rule.Opts.XmlHttpRequest != nil {
-				log.Debugf("Skipping rule with unsupported option: %v", rule.Raw)
+				log.Tracef("Skipping rule with unsupported option: %v", rule.Raw)
 				skippedRules++
 			} else {
 				err = matcher.AddRule(rule, 0)
