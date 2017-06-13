@@ -19,7 +19,7 @@ import (
 )
 
 const (
-	easylistURL = "https://easylist.to/easylist/easylist.txt"
+	easylistURL = "https://easylist-downloads.adblockplus.org/easylistchina+easylist.txt"
 )
 
 var (
