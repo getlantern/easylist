@@ -24,7 +24,7 @@ func TestBlock(t *testing.T) {
 
 	_l := l.(*list)
 	assert.True(t, _l.domainMatchers.Len() > 1000, "List has too few domains")
-	m, _ := _l.domainMatchers.Get(reverse("cdn.adblade.com"))
+	m, _ := _l.domainMatchers.Get(reverse("pubads.g.doubleclick.net"))
 	assert.NotNil(t, m)
 
 	req, _ := http.NewRequest("GET", "http://osnews.com", nil)
@@ -34,19 +34,22 @@ func TestBlock(t *testing.T) {
 	// req, _ = http.NewRequest("GET", "http://somedomain.com/adwords/stuff", nil)
 	// assert.False(t, l.Allow(req))
 
-	req, _ = http.NewRequest("GET", "https://cdn.adblade.com", nil)
+	req, _ = http.NewRequest("GET", "https://pubads.g.doubleclick.net", nil)
 	assert.False(t, l.Allow(req), "Domain on list should not be allowed")
 
-	req, _ = http.NewRequest("GET", "http://cdn.adblade.com:8080", nil)
+	req, _ = http.NewRequest("GET", "https://pubads.g.doubleclick.net/stuff", nil)
+	assert.False(t, l.Allow(req), "URL with domain on list should not be allowed")
+
+	req, _ = http.NewRequest("GET", "http://pubads.g.doubleclick.net:8080", nil)
 	assert.False(t, l.Allow(req), "Domain on list should not be allowed")
 
-	req, _ = http.NewRequest("GET", "https://cdn.adblade.com:443", nil)
+	req, _ = http.NewRequest("GET", "https://pubads.g.doubleclick.net:443", nil)
 	assert.False(t, l.Allow(req), "Domain on list should not be allowed")
 
-	req, _ = http.NewRequest("GET", "https://subdomain.cdn.adblade.com:443", nil)
+	req, _ = http.NewRequest("GET", "https://subdomain.pubads.g.doubleclick.net:443", nil)
 	assert.False(t, l.Allow(req), "Subdomain of domain on list should not be allowed")
 
-	req, _ = http.NewRequest("GET", "https://subdomaincdn.adblade.com:443", nil)
+	req, _ = http.NewRequest("GET", "https://subdomainpubads.g.doubleclick.net:443", nil)
 	assert.True(t, l.Allow(req), "Superset name of domain on list (looks like subdomain without dot separator) should be allowed")
 
 	req, _ = http.NewRequest("GET", "https://c-sharpcorner.com/something/allowed", nil)

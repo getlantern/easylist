@@ -52648,6 +52648,7 @@ a.zortinah.com^$webrtc,websocket
 ||cbpirate.com/getimg.php?
 ||cccam.co/banner_big.gif
 ||cdn.adblade.com^$third-party
+||pubads.g.doubleclick.net*
 ||cdn.assets.gorillanation.com^$third-party
 ||cdn.cdncomputer.com/js/main.js
 ||cdn.comparecards.com^$domain=fortune.com|time.com
