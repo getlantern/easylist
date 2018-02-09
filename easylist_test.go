@@ -89,6 +89,19 @@ func TestEmpty(t *testing.T) {
 	assert.True(t, l.Allow(req), "Domain should be allowed if list is empty")
 }
 
+func TestAndList(t *testing.T) {
+	assert.True(t, AndList{}.Allow(nil))
+	assert.True(t, AndList{staticList(true)}.Allow(nil))
+	assert.True(t, AndList{staticList(true), staticList(true)}.Allow(nil))
+	assert.False(t, AndList{staticList(true), staticList(false)}.Allow(nil))
+}
+
+type staticList bool
+
+func (l staticList) Allow(req *http.Request) bool {
+	return bool(l)
+}
+
 func BenchmarkPass(b *testing.B) {
 	l, err := Open("easylist.txt", 5*time.Minute)
 	if err != nil {

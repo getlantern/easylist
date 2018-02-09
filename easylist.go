@@ -19,7 +19,7 @@ import (
 )
 
 const (
-	easylistURL = "https://easylist-downloads.adblockplus.org/easylistchina+easylist.txt"
+	defaultEasylistURL = "https://easylist-downloads.adblockplus.org/easylistchina+easylist.txt"
 )
 
 var (
@@ -35,8 +35,15 @@ type List interface {
 }
 
 // Open opens a new list, caching the data at cacheFile and checking for updates
-// every checkInterval.
+// every checkInterval. The list is fetched from
+// https://easylist-downloads.adblockplus.org/easylistchina+easylist.txt.
 func Open(cacheFile string, checkInterval time.Duration) (List, error) {
+	return OpenWithURL(defaultEasylistURL, cacheFile, checkInterval)
+}
+
+// OpenWithURL opens a new list, caching the data at cacheFile and checking for
+// updates at the specified url every checkInterval.
+func OpenWithURL(easylistURL string, cacheFile string, checkInterval time.Duration) (List, error) {
 	l := &list{}
 	err := urlcache.Open(easylistURL, cacheFile, checkInterval, func(r io.Reader) error {
 		domainMatchers := make(map[string]interface{}, 1000)
@@ -176,4 +183,17 @@ func reverse(input string) string {
 	}
 	// Convert back to UTF-8.
 	return string(runes)
+}
+
+// AndList is a List that allows requests if and only if all contained Lists
+// allow the request.
+type AndList []List
+
+func (l AndList) Allow(req *http.Request) bool {
+	for _, sl := range l {
+		if !sl.Allow(req) {
+			return false
+		}
+	}
+	return true
 }
