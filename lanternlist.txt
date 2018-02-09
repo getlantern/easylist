@@ -1,0 +1,12 @@
+[Lantern]
+! Checksum: 2J/ENwSYTGQ26oj1RlLkxw
+! Version: 201802090000
+! Title: EasyList Lantern
+! EasyList Lantern subscription
+! Last modified: 09 Feb 2018 00:00 UTC
+! Expires: 1 days (update frequency)
+! Homepage: http://www.getlantern.org/
+!
+!-----------------------Lantern advert blocking filters------------------------!
+||googleadservices.com^$third-party
+||doubleclick.net^$third-party
