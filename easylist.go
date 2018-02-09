@@ -197,3 +197,10 @@ func (l AndList) Allow(req *http.Request) bool {
 	}
 	return true
 }
+
+// ListFunc wraps a function into a List.
+type ListFunc func(req *http.Request) bool
+
+func (l ListFunc) Allow(req *http.Request) bool {
+	return l(req)
+}

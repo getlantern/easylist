@@ -96,10 +96,8 @@ func TestAndList(t *testing.T) {
 	assert.False(t, AndList{staticList(true), staticList(false)}.Allow(nil))
 }
 
-type staticList bool
-
-func (l staticList) Allow(req *http.Request) bool {
-	return bool(l)
+func staticList(allow bool) List {
+	return ListFunc(func(req *http.Request) bool { return allow })
 }
 
 func BenchmarkPass(b *testing.B) {
