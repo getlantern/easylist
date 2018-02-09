@@ -10,3 +10,4 @@
 !-----------------------Lantern advert blocking filters------------------------!
 ||googleadservices.com^$third-party
 ||doubleclick.net^$third-party
+||cpro.baidustatic.com^$third-party
