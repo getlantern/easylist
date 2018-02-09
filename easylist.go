@@ -19,7 +19,8 @@ import (
 )
 
 const (
-	defaultEasylistURL = "https://easylist-downloads.adblockplus.org/easylistchina+easylist.txt"
+	// DefaultURL is the default location for fetching updated easylists
+	DefaultURL = "https://easylist-downloads.adblockplus.org/easylistchina+easylist.txt"
 )
 
 var (
@@ -38,7 +39,7 @@ type List interface {
 // every checkInterval. The list is fetched from
 // https://easylist-downloads.adblockplus.org/easylistchina+easylist.txt.
 func Open(cacheFile string, checkInterval time.Duration) (List, error) {
-	return OpenWithURL(cacheFile, defaultEasylistURL, checkInterval)
+	return OpenWithURL(cacheFile, DefaultURL, checkInterval)
 }
 
 // OpenWithURL opens a new list, caching the data at cacheFile and checking for
