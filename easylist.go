@@ -38,12 +38,12 @@ type List interface {
 // every checkInterval. The list is fetched from
 // https://easylist-downloads.adblockplus.org/easylistchina+easylist.txt.
 func Open(cacheFile string, checkInterval time.Duration) (List, error) {
-	return OpenWithURL(defaultEasylistURL, cacheFile, checkInterval)
+	return OpenWithURL(cacheFile, defaultEasylistURL, checkInterval)
 }
 
 // OpenWithURL opens a new list, caching the data at cacheFile and checking for
 // updates at the specified url every checkInterval.
-func OpenWithURL(easylistURL string, cacheFile string, checkInterval time.Duration) (List, error) {
+func OpenWithURL(cacheFile string, easylistURL string, checkInterval time.Duration) (List, error) {
 	l := &list{}
 	err := urlcache.Open(easylistURL, cacheFile, checkInterval, func(r io.Reader) error {
 		domainMatchers := make(map[string]interface{}, 1000)

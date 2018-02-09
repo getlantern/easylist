@@ -17,15 +17,21 @@ func TestReverse(t *testing.T) {
 }
 
 func TestBlock(t *testing.T) {
-	l, err := Open("easylist.txt", 5*time.Minute)
+	l1, err := Open("easylist.txt", 5*time.Minute)
+	if !assert.NoError(t, err) {
+		return
+	}
+	_l := l1.(*list)
+	assert.True(t, _l.domainMatchers.Len() > 1000, "List has too few domains")
+	m, _ := _l.domainMatchers.Get(reverse("cdn.adblade.com"))
+	assert.NotNil(t, m)
+
+	l2, err := OpenWithURL("lanternlist.txt", "https://github.com/getlantern/easylist/raw/master/lanternlist.txt", 5*time.Minute)
 	if !assert.NoError(t, err) {
 		return
 	}
 
-	_l := l.(*list)
-	assert.True(t, _l.domainMatchers.Len() > 1000, "List has too few domains")
-	m, _ := _l.domainMatchers.Get(reverse("cdn.adblade.com"))
-	assert.NotNil(t, m)
+	l := AndList{l1, l2}
 
 	req, _ := http.NewRequest("GET", "http://osnews.com", nil)
 	assert.True(t, l.Allow(req), "Domain that doesn't appear on list should be allowed")
@@ -33,6 +39,18 @@ func TestBlock(t *testing.T) {
 	// Not currently checking non-domain-specific rules
 	// req, _ = http.NewRequest("GET", "http://somedomain.com/adwords/stuff", nil)
 	// assert.False(t, l.Allow(req))
+
+	req, _ = http.NewRequest("GET", "https://googleads.g.doubleclick.net/anything", nil)
+	assert.True(t, l1.Allow(req), "Domain only on lantern list should be allowed")
+
+	req, _ = http.NewRequest("GET", "https://googleads.g.doubleclick.net/anything", nil)
+	assert.False(t, l.Allow(req), "Domain on lantern list should not be allowed")
+
+	req, _ = http.NewRequest("GET", "https://www.googleadservices.com/anything", nil)
+	assert.True(t, l1.Allow(req), "Domain only on lantern list should be allowed")
+
+	req, _ = http.NewRequest("GET", "https://www.googleadservices.com/anything", nil)
+	assert.False(t, l.Allow(req), "Domain on lantern list should not be allowed")
 
 	req, _ = http.NewRequest("GET", "https://cdn.adblade.com", nil)
 	assert.False(t, l.Allow(req), "Domain on list should not be allowed")
