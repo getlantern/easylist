@@ -3,6 +3,7 @@
 package easylist
 
 import (
+	"compress/gzip"
 	"fmt"
 	"io"
 	"net"
@@ -20,7 +21,7 @@ import (
 
 const (
 	// DefaultURL is the default location for fetching updated easylists
-	DefaultURL = "https://easylist-downloads.adblockplus.org/easylistchina+easylist.txt"
+	DefaultURL = "https://easylist-downloads.adblockplus.org/easylistchina+easylist.txt.gz"
 )
 
 var (
@@ -38,15 +39,22 @@ type List interface {
 // Open opens a new list, caching the data at cacheFile and checking for updates
 // every checkInterval. The list is fetched from
 // https://easylist-downloads.adblockplus.org/easylistchina+easylist.txt.
-func Open(cacheFile string, checkInterval time.Duration) (List, error) {
-	return OpenWithURL(cacheFile, DefaultURL, checkInterval)
+func Open(cacheFile string, gzipped bool, checkInterval time.Duration) (List, error) {
+	return OpenWithURL(cacheFile, DefaultURL, gzipped, checkInterval)
 }
 
 // OpenWithURL opens a new list, caching the data at cacheFile and checking for
 // updates at the specified url every checkInterval.
-func OpenWithURL(cacheFile string, easylistURL string, checkInterval time.Duration) (List, error) {
+func OpenWithURL(cacheFile string, easylistURL string, gzipped bool, checkInterval time.Duration) (List, error) {
 	l := &list{}
 	err := urlcache.Open(easylistURL, cacheFile, checkInterval, func(r io.Reader) error {
+		if gzipped {
+			var gzErr error
+			r, gzErr = gzip.NewReader(r)
+			if gzErr != nil {
+				return fmt.Errorf("Unable to open gzipped data stream: %v", gzErr)
+			}
+		}
 		domainMatchers := make(map[string]interface{}, 1000)
 		rules, err := adblock.ParseRules(r)
 		if err != nil {

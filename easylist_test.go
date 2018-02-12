@@ -17,7 +17,7 @@ func TestReverse(t *testing.T) {
 }
 
 func TestBlock(t *testing.T) {
-	l1, err := Open("easylist.txt", 5*time.Minute)
+	l1, err := Open("easylist.txt.gz", true, 5*time.Minute)
 	if !assert.NoError(t, err) {
 		return
 	}
@@ -26,7 +26,7 @@ func TestBlock(t *testing.T) {
 	m, _ := _l.domainMatchers.Get(reverse("cdn.adblade.com"))
 	assert.NotNil(t, m)
 
-	l2, err := OpenWithURL("lanternlist.txt", "https://github.com/getlantern/easylist/raw/master/lanternlist.txt", 5*time.Minute)
+	l2, err := OpenWithURL("lanternlist.txt.gz", "https://raw.githubusercontent.com/getlantern/easylist/master/lanternlist.txt.gz", true, 5*time.Minute)
 	if !assert.NoError(t, err) {
 		return
 	}
@@ -119,7 +119,7 @@ func staticList(allow bool) List {
 }
 
 func BenchmarkPass(b *testing.B) {
-	l, err := Open("easylist.txt", 5*time.Minute)
+	l, err := Open("easylist.txt.gz", true, 5*time.Minute)
 	if err != nil {
 		b.Fatalf("Unable to open easylist: %v", err)
 	}
@@ -144,7 +144,7 @@ func BenchmarkPass(b *testing.B) {
 }
 
 func BenchmarkSampleSites(b *testing.B) {
-	l, err := Open("easylist.txt", 5*time.Minute)
+	l, err := Open("easylist.txt.gz", true, 5*time.Minute)
 	if err != nil {
 		b.Fatalf("Unable to open easylist: %v", err)
 	}
