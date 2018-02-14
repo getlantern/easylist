@@ -76,8 +76,11 @@ func TestBlock(t *testing.T) {
 	req, _ = http.NewRequest("GET", "https://subdomain.c-sharpcorner.com/stuff/banners/", nil)
 	assert.False(t, l.Allow(req), "Subdomain with path matching rule should not be allowed")
 
-	req, _ = http.NewRequest("GET", "https://subdomain.google.com/pagead/imgad?id=CICAgKDLm4jqFBABGAEyCIOA1Ft_hUOC", nil)
-	assert.False(t, l.Allow(req), "Subdomain with path matching rule should not be allowed")
+	req, _ = http.NewRequest("GET", "https://www.youtube.com/get_video_info?html5=1&video_id=ZPSBc0OOXeE&cpn=qdBhXkp4vaTEuoTY&eurl=https%3A%2F%2Fwww.youtube.com%2Fvideo_masthead%3Fvideo_id%3DZPSBc0OOXeE%26textLine1%3DGoogle%2BHome%2BMini%26autocrop%3D1%26autoplay_start_time%3D0%26autoplay&el=adunit&hl=en_US&sts=17574&lact=328&c=WEB_EMBEDDED_PLAYER&cver=20180213&cplayer=UNIPLAYER&cbr=Chrome&cbrver=64.0.3282.140&cos=Windows&cosver=10.0&adformat=1_8&mute=true&width=424&height=640&authuser=0&ei=ErKDWru8LYijwQHkqaCwDg&iframe=1&embed_config=%7B%7D", nil)
+	assert.False(t, l.Allow(req), "Youtube preroll ad should not be allowed")
+
+	req, _ = http.NewRequest("GET", "https://www.youtube.com/ptracking?html5=1&video_id=MOo9iJ8RYWM&cpn=Q5nr3JNONePzoqsV&plid=AAVlIVJ0Di2EsEvm&ei=44SDWun6A8S0DMXjpNgK&ptk=youtube_host&ptchn=youtube_host&pltype=adhost&content_v=Dy207C8SKMI", nil)
+	assert.False(t, l.Allow(req), "Youtube preroll ad tracking should not be allowed")
 
 	req, _ = http.NewRequest("GET", "https://s3.amazonaws.com", nil)
 	assert.True(t, l.Allow(req), "Domain should be allowed by default")
